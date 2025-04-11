@@ -54,7 +54,13 @@
       <q-card
         flat
         bordered
-        class="q-pa-md bg-grey-8 q-mb-md du-card"
+        class="q-pa-md q-mb-md du-card"
+        :style="
+          explore.image
+            ? `background-image: url('${explore.image}'); background-size: 100vw 800px;
+background-repeat: no-repeat; background-position: center;`
+            : ''
+        "
         v-for="explore in readerTiles"
         :key="explore.title"
         @click="$router.push(explore.to)"
@@ -110,24 +116,27 @@ const readerTiles = [
     icon: 'explore',
     to: '/explore',
     desc: 'Browse universes, stories, and lore.',
+    image: '/src/assets/images/explore_worlds.png',
   },
   {
     title: 'Continue Reading',
     icon: 'menu_book',
     to: '/read-latest',
     desc: 'Pick up where you left off.',
+    image: '/src/assets/images/continue_reading.png',
   },
   {
     title: 'Saved Moments',
     icon: 'bookmark',
     to: '/bookmarks',
     desc: 'Revisit your highlights and notes.',
+    image: '/src/assets/images/saved_moments.png',
   },
 ]
 </script>
 <style lang="scss">
 .du-card {
-  min-height: 200px;
+  min-height: 300px;
   cursor: pointer;
   display: flex;
   align-items: center;

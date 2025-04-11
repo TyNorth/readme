@@ -6,6 +6,10 @@
         <q-btn flat label="Explore" to="/explore" />
         <q-btn flat label="My Universes" to="/my-universes" />
         <q-space />
+
+        <!-- Creator Mode Toggle -->
+        <q-toggle v-model="creatorMode" label="Creator Mode" color="primary" />
+
         <q-btn flat icon="sym_o_account_circle" to="/profile" />
       </q-toolbar>
     </q-header>
@@ -19,3 +23,16 @@
     </q-footer>
   </q-layout>
 </template>
+
+<script setup>
+import { computed } from 'vue'
+import { useUserStore } from '@/stores/user-store'
+
+const userStore = useUserStore()
+
+// Two-way bind using Pinia state + action
+const creatorMode = computed({
+  get: () => userStore.creatorMode,
+  set: (val) => userStore.setCreatorMode(val),
+})
+</script>
