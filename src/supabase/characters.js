@@ -1,12 +1,19 @@
 import { supabase } from 'src/boot/supabase'
 
 export async function getCharacters(universeId) {
+  if (!universeId) throw new Error('Missing universeId')
+
   const { data, error } = await supabase
     .from('characters')
     .select('*')
     .eq('universe_id', universeId)
 
-  if (error) throw error
+  if (error) {
+    console.error('[getCharacters] Supabase error:', error)
+    throw error
+  }
+
+  console.log('[getCharacters] Result:', data)
   return data
 }
 

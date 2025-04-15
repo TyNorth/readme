@@ -1,22 +1,24 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 import { getBookmarksByUser } from '@/supabase/bookmarks'
 
-export const useBookmarkStore = defineStore('bookmarks', () => {
-  const bookmarks = ref([])
-  const loading = ref(false)
-  const error = ref(null)
+export const useBookmarkStore = defineStore('bookmarks', {
+  state: () => ({
+    bookmarks: [],
+    loading: false,
+    error: null,
+  }),
 
-  async function fetchBookmarks(userId) {
-    loading.value = true
-    try {
-      bookmarks.value = await getBookmarksByUser(userId)
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  return { bookmarks, loading, error, fetchBookmarks }
+  actions: {
+    async fetchBookmarks(userId) {
+      this.loading = true
+      this.error = null
+      try {
+        this.bookmarks = await getBookmarksByUser(userId)
+      } catch (err) {
+        this.error = err
+      } finally {
+        this.loading = false
+      }
+    },
+  },
 })

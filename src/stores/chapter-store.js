@@ -1,22 +1,24 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 import { getChaptersByStory } from '@/supabase/chapters'
 
-export const useChapterStore = defineStore('chapters', () => {
-  const chapters = ref([])
-  const loading = ref(false)
-  const error = ref(null)
+export const useChapterStore = defineStore('chapters', {
+  state: () => ({
+    chapters: [],
+    loading: false,
+    error: null,
+  }),
 
-  async function fetchChapters(storyId) {
-    loading.value = true
-    try {
-      chapters.value = await getChaptersByStory(storyId)
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  return { chapters, loading, error, fetchChapters }
+  actions: {
+    async fetchChapters(storyId) {
+      this.loading = true
+      this.error = null
+      try {
+        this.chapters = await getChaptersByStory(storyId)
+      } catch (err) {
+        this.error = err
+      } finally {
+        this.loading = false
+      }
+    },
+  },
 })

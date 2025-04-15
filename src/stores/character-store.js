@@ -1,22 +1,25 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 import { getCharacters } from '@/supabase/characters'
 
-export const useCharacterStore = defineStore('characters', () => {
-  const characters = ref([])
-  const loading = ref(false)
-  const error = ref(null)
+export const useCharacterStore = defineStore('characters', {
+  state: () => ({
+    characters: [],
+    loading: false,
+    error: null,
+  }),
 
-  async function fetchCharacters(universeId) {
-    loading.value = true
-    try {
-      characters.value = await getCharacters(universeId)
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  return { characters, loading, error, fetchCharacters }
+  actions: {
+    async fetchCharacters(universeId) {
+      this.loading = true
+      this.error = null
+      try {
+        this.characters = await getCharacters(universeId)
+        console.log(this.characters)
+      } catch (err) {
+        this.error = err
+      } finally {
+        this.loading = false
+      }
+    },
+  },
 })

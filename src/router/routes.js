@@ -3,12 +3,72 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
+    meta: {
+      requiresAuth: true,
+    },
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
-      { path: 'explore', component: () => import('pages/ExplorePage.vue') },
-      { path: 'my-universes', component: () => import('pages/MyUniverses.vue') },
-      { path: 'profile', component: () => import('pages/ProfilePage.vue') },
+      {
+        path: 'explore',
+        component: () => import('pages/ExplorePage.vue'),
+        meta: {
+          breadcrumb: 'Explore',
+          icon: 'sym_o_explore',
+          dynamic: 'explore',
+        },
+      },
+      {
+        path: 'my-universes/:user_id',
+        component: () => import('src/pages/universe/MyUniverses.vue'),
+        meta: {
+          breadcrumb: 'Universe',
+          icon: 'sym_o_explore',
+          dynamic: 'explore',
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'profile',
+        component: () => import('pages/ProfilePage.vue'),
+        meta: {
+          breadcrumb: 'Profile',
+          icon: 'sym_o_profile',
+          dynamic: 'profile',
+        },
+      },
+      {
+        path: 'universe/:id/view',
+        component: () => import('pages/universe/UniverseView.vue'),
+        meta: {
+          breadcrumb: 'Universe',
+          icon: 'sym_o_planet',
+          dynamic: 'universe',
+        },
+      },
+      {
+        path: 'universe/:universeId/character/:characterId',
+        component: () => import('pages/universe/CharacterPage.vue'),
+        meta: {
+          breadcrumb: 'Universe :universeId',
+          icon: 'sym_o_planet',
+          dynamic: 'universe',
+        },
+      },
+      {
+        path: 'universe/:universeId/lore/:loreId',
+        component: () => import('pages/universe/LorePage.vue'),
+        meta: {
+          breadcrumb: 'Lore',
+          icon: 'sym_o_auto_stories',
+          dynamic: 'lore',
+        },
+      },
     ],
+    meta: {
+      breadcrumb: 'Home',
+      icon: 'sym_o_cottage',
+      dynamic: 'home',
+    },
   },
 
   // Auth (Login/Register)
@@ -27,11 +87,51 @@ const routes = [
     component: () => import('layouts/UniverseLayout.vue'),
     children: [
       { path: '', redirect: 'overview' },
-      { path: 'overview', component: () => import('pages/universe/Overview.vue') },
-      { path: 'stories', component: () => import('pages/universe/Stories.vue') },
-      { path: 'characters', component: () => import('pages/universe/Characters.vue') },
-      { path: 'lore', component: () => import('pages/universe/Lore.vue') },
-      { path: 'map', component: () => import('pages/universe/Map.vue') },
+      {
+        path: 'overview',
+        component: () => import('src/pages/universe/OverviewPage.vue'),
+        meta: {
+          breadcrumb: 'Overview',
+          icon: 'sym_o_overview_key',
+          dynamic: 'explore',
+        },
+      },
+      {
+        path: 'stories',
+        component: () => import('src/pages/universe/StoriesDashboard.vue'),
+        meta: {
+          breadcrumb: 'Stories',
+          icon: 'sym_o_history_edu',
+          dynamic: 'stories_dashboard',
+        },
+      },
+      {
+        path: 'characters',
+        component: () => import('src/pages/universe/CharactersDashboard.vue'),
+        meta: {
+          breadcrumb: 'Characters',
+          icon: 'sym_o_group3',
+          dynamic: 'characters_dasboard',
+        },
+      },
+
+      {
+        path: 'lore',
+        component: () => import('src/pages/universe/LoreDashboard.vue'),
+        meta: {
+          breadcrumb: 'Lore Dashboard',
+          icon: 'sym_o_explore',
+          dynamic: 'lore_dashboard',
+        },
+      },
+      {
+        path: 'map',
+        component: () => import('pages/universe/Map.vue'),
+        meta: {
+          breadcrumb: 'Explore',
+          icon: 'sym_o_explore',
+        },
+      },
     ],
   },
 
@@ -39,20 +139,48 @@ const routes = [
   {
     path: '/editor/:storyId',
     component: () => import('layouts/EditorLayout.vue'),
-    children: [{ path: '', component: () => import('pages/editor/StoryEditor.vue') }],
+    children: [
+      {
+        path: '',
+        component: () => import('pages/editor/StoryEditor.vue'),
+        meta: {
+          breadcrumb: 'Explore',
+          icon: 'sym_o_explore',
+        },
+      },
+    ],
   },
 
   // Reader Immersion Mode
   {
     path: '/read/:storyId',
     component: () => import('layouts/ReaderLayout.vue'),
-    children: [{ path: '', component: () => import('pages/reader/ReaderPage.vue') }],
+    children: [
+      {
+        path: '',
+        component: () => import('pages/reader/ReaderPage.vue'),
+        meta: {
+          breadcrumb: 'Explore',
+          icon: 'sym_o_explore',
+        },
+      },
+    ],
   },
 
   // 404 Catch-All
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue'),
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/ErrorNotFound.vue'),
+        meta: {
+          breadcrumb: 'Explore',
+          icon: 'sym_o_explore',
+        },
+      },
+    ],
   },
 ]
 

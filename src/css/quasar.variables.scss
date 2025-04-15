@@ -12,14 +12,20 @@
 // to match your app's branding.
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
 
-$primary   : #1976D2;
-$secondary : #26A69A;
-$accent    : #9C27B0;
+$primary: #c49a43; // Brass gold — richer and more grounded than bright yellow
+$secondary: #446158; // Slate pine green — calm and stable
+$accent: #7d5f91; // Muted royal violet — magical but not flashy
 
-$dark      : #1D1D1D;
-$dark-page : #121212;
+$dark: #181818; // Rich blackened slate
+$dark-page: #111111; // Full depth black
 
-$positive  : #21BA45;
-$negative  : #C10015;
-$info      : #31CCEC;
-$warning   : #F2C037;
+$text: #e6e0d8; // Warm parchment white for legibility
+
+$positive: #58a47d; // Herbal green — restorative, balanced
+$negative: #b04d4d; // Iron red — subtle but serious
+$info: #518aaf; // Ink blue — for status & utility
+$warning: #e3b44b; // Faded amber — warm, not shrill
+
+$text-color: #eaeaea;
+$card-bg: #1e1e1e;
+$chip-bg: $dark;

@@ -1,22 +1,24 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 import { getLoreByUniverse } from '@/supabase/lore'
 
-export const useLoreStore = defineStore('lore', () => {
-  const lore = ref([])
-  const loading = ref(false)
-  const error = ref(null)
+export const useLoreStore = defineStore('lore', {
+  state: () => ({
+    lore: [],
+    loading: false,
+    error: null,
+  }),
 
-  async function fetchLore(universeId) {
-    loading.value = true
-    try {
-      lore.value = await getLoreByUniverse(universeId)
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  return { lore, loading, error, fetchLore }
+  actions: {
+    async fetchLore(universeId) {
+      this.loading = true
+      this.error = null
+      try {
+        this.lore = await getLoreByUniverse(universeId)
+      } catch (err) {
+        this.error = err
+      } finally {
+        this.loading = false
+      }
+    },
+  },
 })

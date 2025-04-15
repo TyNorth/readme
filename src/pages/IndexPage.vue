@@ -1,10 +1,10 @@
 <template>
-  <q-page class="q-pa-md bg-grey-10 text-white">
+  <q-page class="q-pa-md text-white">
     <div class="q-mb-lg text-h4 text-gold">
       Welcome{{ user?.username ? `, ${user.username}` : '' }}
     </div>
 
-    <q-card flat bordered class="q-pa-md bg-grey-9 rounded-borders q-mb-lg">
+    <q-card flat class="q-pa-md bg-grey-9 rounded-borders q-mb-lg">
       <div class="row items-center q-gutter-md">
         <q-icon name="sym_o_lightbulb" color="primary" size="32px" />
         <div>
@@ -32,8 +32,13 @@
       <div class="text-subtitle1 text-gold q-mb-sm">Your Creative Tools</div>
       <q-card
         flat
-        bordered
-        class="q-pa-md bg-grey-8 q-mb-md"
+        class="q-pa-md du-card q-mb-md"
+        :style="
+          tool.image
+            ? `background-image: url('${tool.image}'); background-size: 100vw 600px;
+background-repeat: no-repeat; background-position: center;`
+            : ''
+        "
         v-for="tool in creatorTiles"
         :key="tool.title"
         @click="$router.push(tool.to)"
@@ -42,8 +47,8 @@
         <div class="row items-center q-gutter-md">
           <q-icon :name="`sym_o_${tool.icon}`" size="28px" />
           <div>
-            <div class="text-subtitle2">{{ tool.title }}</div>
-            <div class="text-caption text-grey-4">{{ tool.desc }}</div>
+            <div class="text-h5">{{ tool.title }}</div>
+            <div class="text-subtitle1 text-grey-4">{{ tool.desc }}</div>
           </div>
         </div>
       </q-card>
@@ -53,11 +58,10 @@
       <div class="text-subtitle1 text-gold q-mb-sm">Discover Universes</div>
       <q-card
         flat
-        bordered
         class="q-pa-md q-mb-md du-card"
         :style="
           explore.image
-            ? `background-image: url('${explore.image}'); background-size: 100vw 800px;
+            ? `background-image: url('${explore.image}'); background-size: 100vw 600px;
 background-repeat: no-repeat; background-position: center;`
             : ''
         "
@@ -69,8 +73,8 @@ background-repeat: no-repeat; background-position: center;`
         <div class="row items-center q-gutter-md">
           <q-icon :name="`sym_o_${explore.icon}`" size="28px" />
           <div>
-            <div class="text-subtitle2">{{ explore.title }}</div>
-            <div class="text-caption text-grey-4">{{ explore.desc }}</div>
+            <div class="text-h5">{{ explore.title }}</div>
+            <div class="text-subtitle1 text-grey-4">{{ explore.desc }}</div>
           </div>
         </div>
       </q-card>
@@ -79,36 +83,40 @@ background-repeat: no-repeat; background-position: center;`
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/user-store'
 
 const userStore = useUserStore()
 const user = computed(() => userStore.profile)
+const userId = ref()
 const creatorMode = computed({
   get: () => userStore.creatorMode,
   set: (val) => userStore.setCreatorMode(val),
 })
 
-const creatorTiles = [
+const creatorTiles = ref([
   {
     title: 'My Universes',
     icon: 'hub',
-    to: '/my-universes',
+    to: `/my-universes/${userId.value}`,
     desc: 'Manage your worlds and collaborators.',
+    image: '/src/assets/images/saved_moments.png',
   },
   {
     title: 'Create New Story',
     icon: 'edit_note',
     to: '/universe-select',
     desc: 'Start writing or add new entries.',
+    image: '/src/assets/images/saved_moments.png',
   },
   {
     title: 'Drafts & Edits',
     icon: 'drafts',
     to: '/drafts',
     desc: 'Continue writing or polish your work.',
+    image: '/src/assets/images/saved_moments.png',
   },
-]
+])
 
 const readerTiles = [
   {
@@ -116,7 +124,7 @@ const readerTiles = [
     icon: 'explore',
     to: '/explore',
     desc: 'Browse universes, stories, and lore.',
-    image: '/src/assets/images/explore_worlds.png',
+    image: '/src/assets/images/saved_moments.png',
   },
   {
     title: 'Continue Reading',
@@ -133,10 +141,18 @@ const readerTiles = [
     image: '/src/assets/images/saved_moments.png',
   },
 ]
+
+onMounted(async () => {
+  await userStore.initialize()
+  console.log(userStore.authUser.id)
+  userId.value = computed(() => {
+    return userStore.authUser.id
+  })
+})
 </script>
 <style lang="scss">
 .du-card {
-  min-height: 300px;
+  min-height: 250px;
   cursor: pointer;
   display: flex;
   align-items: center;

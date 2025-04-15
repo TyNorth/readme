@@ -9,6 +9,7 @@ export function useAuth() {
     try {
       const { session: s } = await signInWithEmail(email, password)
       session.value = s
+      return session.value
     } catch (err) {
       error.value = err
     }

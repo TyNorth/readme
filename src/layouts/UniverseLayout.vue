@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header elevated class="bg-primary text-white">
+    <q-header :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-light text-black'">
       <q-toolbar>
         <q-toolbar-title>{{ universeTitle }}</q-toolbar-title>
         <q-space />

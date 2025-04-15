@@ -13,7 +13,7 @@ export default defineConfig((ctx) => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['i18n', 'axios', 'supabase', 'global-vars', 'addressbar-color'],
+    boot: ['i18n', 'axios', 'supabase', 'global-vars', 'addressbar-color', 'dark-mode'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
     css: ['app.scss'],
@@ -253,7 +253,7 @@ export default defineConfig((ctx) => {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'readme',
+        appId: 'LoreLight',
       },
     },
 

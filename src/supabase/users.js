@@ -4,6 +4,7 @@ export async function getUserProfile(userId) {
   const { data, error } = await supabase.from('users').select('*').eq('id', userId).single()
 
   if (error) throw error
+  console.log(data)
   return data
 }
 

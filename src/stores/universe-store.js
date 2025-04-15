@@ -1,33 +1,66 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { getPublicUniverses, getUniversesForUser } from '@/supabase/universes'
+import {
+  getPublicUniverses,
+  getUniversesForUser,
+  updateUniverse,
+  getUniverseById,
+} from '@/supabase/universes'
 
-export const useUniverseStore = defineStore('universes', () => {
-  const universes = ref([])
-  const loading = ref(false)
-  const error = ref(null)
+export const useUniverseStore = defineStore('universes', {
+  state: () => ({
+    universes: [],
+    universe: [],
+    loading: false,
+    error: null,
+  }),
 
-  async function fetchPublicUniverses() {
-    loading.value = true
-    try {
-      universes.value = await getPublicUniverses()
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
-    }
-  }
+  getters: {
+    hasUniverses: (state) => state.universes.length > 0,
+  },
 
-  async function fetchUserUniverses(userId) {
-    loading.value = true
-    try {
-      universes.value = await getUniversesForUser(userId)
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
-    }
-  }
+  actions: {
+    async fetchPublicUniverses() {
+      this.loading = true
+      this.error = null
+      try {
+        this.universes = await getPublicUniverses()
+      } catch (err) {
+        this.error = err
+      } finally {
+        this.loading = false
+      }
+    },
+    async fetchUniverse(universeId) {
+      if (!universeId) return
+      this.loading = true
+      this.error = null
+      try {
+        const universe = await getUniverseById(universeId)
+        this.universe = [universe] // or set a separate `this.universe`
+      } catch (err) {
+        this.error = err
+      } finally {
+        this.loading = false
+      }
+    },
 
-  return { universes, loading, error, fetchPublicUniverses, fetchUserUniverses }
+    async fetchUserUniverses(userId) {
+      this.loading = true
+      this.error = null
+      try {
+        this.universes = await getUniversesForUser(userId)
+      } catch (err) {
+        this.error = err
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async updateUniverseTags(universeId, tags) {
+      const updated = await updateUniverse(universeId, { tags })
+      const index = this.universes.findIndex((u) => u.id === universeId)
+      if (index !== -1) this.universes[index] = updated
+      return updated
+    },
+  },
 })

@@ -1,28 +1,97 @@
 <template>
-  <q-card
-    flat
-    bordered
-    class="q-pa-md bg-grey-10 text-white rounded-borders cursor-pointer"
+  <div
+    class="universe-card"
+    @mousemove="handleMouseMove"
+    @mouseleave="resetTransform"
     @click="$emit('click')"
   >
-    <q-img
-      :src="banner"
-      ratio="16/9"
-      spinner-color="white"
-      class="rounded-borders overflow-hidden"
-    />
-    <q-card-section>
-      <div class="text-h6">{{ title }}</div>
-      <div class="text-caption text-grey-4">{{ summary }}</div>
-    </q-card-section>
-  </q-card>
+    <q-card
+      flat
+      bordered
+      class="q-pa-sm full-height"
+      :class="$q.dark.isActive ? 'bg-grey-9 text-white' : 'bg-light text-black'"
+    >
+      <q-img
+        :src="banner"
+        ratio="2/3"
+        class="rounded-borders"
+        style="max-height: 200px"
+        spinner-color="primary"
+      />
+      <q-card-section class="q-px-sm q-pt-sm q-pb-none">
+        <div class="text-subtitle1 text-shimmer">{{ title }}</div>
+        <div class="text-caption ellipsis-3-lines">{{ summary }}</div>
+      </q-card-section>
+
+      <q-separator />
+
+      <q-card-section class="q-px-sm q-pt-sm q-pb-sm fixed-bottom">
+        <div class="row q-gutter-xs">
+          <q-chip
+            v-for="tag in tags"
+            :key="tag"
+            size="sm"
+            dense
+            color="primary"
+            text-color="white"
+            icon="sym_o_style"
+          >
+            {{ tag }}
+          </q-chip>
+        </div>
+      </q-card-section>
+    </q-card>
+  </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
 defineProps({
   title: String,
   summary: String,
   banner: String,
+  tags: {
+    type: Array,
+    default: () => [],
+  },
 })
+
 defineEmits(['click'])
+
+function handleMouseMove(e) {
+  const cardEl = e.currentTarget
+  const rect = cardEl.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+  const centerX = rect.width / 2
+  const centerY = rect.height / 2
+  const rotateX = ((y - centerY) / centerY) * -12
+  const rotateY = ((x - centerX) / centerX) * 12
+  cardEl.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`
+}
+
+function resetTransform(e) {
+  e.currentTarget.style.transform = 'rotateX(0deg) rotateY(0deg)'
+}
 </script>
+
+<style scoped>
+.universe-card {
+  height: 100%;
+  width: 100%;
+  max-width: 250px;
+  min-height: 370px;
+  perspective: 1000px;
+  transition: transform 0.2s ease;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+.universe-card > .q-card {
+  border-radius: 12px;
+  transition: box-shadow 0.3s ease;
+}
+.universe-card:hover > .q-card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+</style>

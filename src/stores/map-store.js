@@ -1,22 +1,24 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 import { getMapsByUniverse } from '@/supabase/maps'
 
-export const useMapStore = defineStore('maps', () => {
-  const maps = ref([])
-  const loading = ref(false)
-  const error = ref(null)
+export const useMapStore = defineStore('maps', {
+  state: () => ({
+    maps: [],
+    loading: false,
+    error: null,
+  }),
 
-  async function fetchMaps(universeId) {
-    loading.value = true
-    try {
-      maps.value = await getMapsByUniverse(universeId)
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  return { maps, loading, error, fetchMaps }
+  actions: {
+    async fetchMaps(universeId) {
+      this.loading = true
+      this.error = null
+      try {
+        this.maps = await getMapsByUniverse(universeId)
+      } catch (err) {
+        this.error = err
+      } finally {
+        this.loading = false
+      }
+    },
+  },
 })
