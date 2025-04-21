@@ -23,3 +23,19 @@ export async function createCharacter(payload) {
   if (error) throw error
   return data
 }
+
+export async function updateCharacter(id, updates) {
+  const { data, error } = await supabase
+    .from('characters')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('[updateCharacter] Supabase error:', error)
+    throw error
+  }
+
+  return data
+}

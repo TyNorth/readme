@@ -8,7 +8,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above bordered>
+    <q-drawer show-if-above>
       <q-list>
         <q-item clickable to="overview">
           <q-item-section>Overview</q-item-section>

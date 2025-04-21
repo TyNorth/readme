@@ -3,9 +3,7 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    meta: {
-      requiresAuth: true,
-    },
+
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
       {
@@ -106,6 +104,16 @@ const routes = [
         },
       },
       {
+        path: 'stories/:storyId/overview',
+        component: () => import('src/pages/universe/StoryOverview.vue'),
+        meta: {
+          breadcrumb: 'Story Overview',
+          icon: 'sym_o_menu_book',
+          dynamic: 'story_overview',
+        },
+      },
+
+      {
         path: 'characters',
         component: () => import('src/pages/universe/CharactersDashboard.vue'),
         meta: {
@@ -146,6 +154,15 @@ const routes = [
         meta: {
           breadcrumb: 'Explore',
           icon: 'sym_o_explore',
+        },
+      },
+      {
+        path: '/editor/:storyId/chapter/:chapterId',
+        component: () => import('pages/editor/ChapterEditor.vue'),
+        meta: {
+          breadcrumb: 'Chapter Editor',
+          icon: 'sym_o_edit_document',
+          dynamic: 'chapter_editor',
         },
       },
     ],
