@@ -1,6 +1,6 @@
 <template>
   <q-page class="chapter-editor">
-    <!-- Header (optional in immersive) -->
+    <!-- Header -->
     <div class="editor-header row items-center justify-between q-pa-md" v-if="!isImmersive">
       <div>
         <div class="text-caption text-grey-5">Story</div>
@@ -15,12 +15,12 @@
       />
     </div>
 
-    <!-- Editable Chapter Title -->
+    <!-- Chapter Title -->
     <div class="q-pa-md">
       <InlineEditableText v-model="chapter.title" class="editor-title" :rules="[rules.required]" />
     </div>
 
-    <!-- Immersive Writing Pad -->
+    <!-- Writing Pad -->
     <div class="editor-container q-px-md q-pb-xl">
       <InlineEditableTextarea
         v-model="chapter.text"
@@ -28,50 +28,86 @@
         :autogrow="false"
         filled
         class="editor-content"
+        @save="manualSave"
       />
     </div>
 
-    <!-- Save Feedback -->
+    <!-- Save Info -->
     <div v-if="!isImmersive" class="text-caption text-grey-5 q-px-md q-pb-md">
       <q-icon name="sym_o_save" class="q-mr-xs" />
-      Last saved {{ lastSavedRelative }}
+      Last saved {{ formattedUpdatedAt }}
     </div>
   </q-page>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
+import { ref, onMounted, watch, onBeforeUnmount, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '@/boot/supabase'
 import { debounce } from 'lodash-es'
 
 import InlineEditableText from '@/components/universe/dashboard/InlineEditableText.vue'
 import InlineEditableTextarea from '@/components/universe/dashboard/InlineEditableTextarea.vue'
+import { notifySuccess } from 'src/utils/notify'
 
 const route = useRoute()
 const storyId = route.params.storyId
 const chapterId = route.params.chapterId
 
 const story = ref(null)
-const chapter = ref({ title: '', content: '' })
+const chapter = ref({ title: '', text: '' })
 const isImmersive = ref(false)
-const lastSavedAt = ref(null)
 
 const rules = {
   required: (val) => !!val || 'Required',
 }
 
-const lastSavedRelative = computed(() => {
-  if (!lastSavedAt.value) return '...'
-  const diff = Math.round((Date.now() - new Date(lastSavedAt.value)) / 1000)
-  if (diff < 10) return 'a few seconds ago'
-  if (diff < 60) return `${diff} seconds ago`
-  return `${Math.floor(diff / 60)} minute(s) ago`
+const formattedUpdatedAt = computed(() => {
+  if (!chapter.value.updated_at) return '...'
+  return new Date(chapter.value.updated_at).toLocaleTimeString()
 })
 
+// 🔁 Save to Supabase and update local state
+async function manualSave() {
+  if (!chapter.value.id) return
+
+  const { data, error } = await supabase
+    .from('chapters')
+    .update({
+      title: chapter.value.title,
+      text: chapter.value.text,
+    })
+    .eq('id', chapterId)
+    .select()
+
+  if (data && data.length) {
+    chapter.value = data[0] // Update local state including updated_at
+    notifySuccess(`Last saved at ${new Date().toLocaleTimeString()}`)
+  }
+
+  if (error) {
+    console.error('Manual Save Error:', error)
+  }
+}
+
+// ⌨ Hotkeys
 function handleKeydown(e) {
-  if (e.key === 'Escape') {
-    isImmersive.value = false
+  switch (e.key) {
+    case 'Escape':
+      isImmersive.value = false
+      break
+    case 's':
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault()
+        manualSave()
+      }
+      break
+    case 'i':
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault()
+        isImmersive.value = !isImmersive.value
+      }
+      break
   }
 }
 
@@ -83,29 +119,55 @@ onMounted(async () => {
   window.addEventListener('keydown', handleKeydown)
 
   const { data: s } = await supabase.from('stories').select('title').eq('id', storyId).single()
+
   story.value = s
 
   const { data: c } = await supabase.from('chapters').select('*').eq('id', chapterId).single()
+
   chapter.value = c
-  lastSavedAt.value = new Date()
 })
 
+// Debounced auto-save
 const autoSave = debounce(async () => {
   if (!chapter.value.id) return
 
-  await supabase
+  const { data, error } = await supabase
     .from('chapters')
     .update({
       title: chapter.value.title,
-      content: chapter.value.text,
+      text: chapter.value.text,
     })
     .eq('id', chapterId)
+    .select()
 
-  lastSavedAt.value = new Date()
-}, 10000)
+  if (data && data.length) {
+    chapter.value = data[0] // Update local state including updated_at
+    notifySuccess(`Last saved at ${new Date().toLocaleTimeString()}`)
+  }
 
-watch(() => chapter.value.title, autoSave)
-watch(() => chapter.value.text, autoSave)
+  if (error) {
+    console.error('Auto Save Error:', error)
+  }
+}, 5000)
+
+// Watchers
+watch(
+  () => chapter.value.title,
+  (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+      autoSave()
+    }
+  },
+)
+
+watch(
+  () => chapter.value.text,
+  (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+      autoSave()
+    }
+  },
+)
 </script>
 
 <style scoped>

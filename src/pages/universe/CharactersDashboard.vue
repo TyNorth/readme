@@ -70,10 +70,7 @@ function handleUpdated(updated) {
 
 onMounted(async () => {
   loading.value = true
-  const { data, error } = await supabase
-    .from('characters')
-    .select('*')
-    .eq('universe_id', universeId)
+  const { data } = await supabase.from('characters').select('*').eq('universe_id', universeId)
   characters.value = data || []
   loading.value = false
 })

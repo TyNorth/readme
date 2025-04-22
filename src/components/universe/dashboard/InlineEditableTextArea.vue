@@ -16,7 +16,7 @@
         @blur="finish"
         class="q-mb-none"
       />
-      <q-btn flat round dense icon="sym_o_lock_open" size="sm" class="q-mt-sm" @click="finish" />
+      <q-btn flat rounded dense icon="sym_o_lock_open" size="sm" class="q-mt-sm" @click="finish" />
     </div>
   </div>
 </template>
@@ -31,7 +31,7 @@ const props = defineProps({
     default: true,
   },
 })
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'save'])
 
 const editing = ref(false)
 const localValue = ref(props.modelValue)
@@ -46,19 +46,6 @@ watch(
 function finish() {
   editing.value = false
   emit('update:modelValue', localValue.value)
+  emit('save') // 🔁 Trigger save on lock toggle
 }
 </script>
-
-<style scoped>
-.editable-textarea {
-  margin-bottom: 1rem;
-}
-.read-mode {
-  border-left: 4px solid #c49a43;
-  padding-left: 1rem;
-}
-.edit-mode {
-  display: flex;
-  flex-direction: column;
-}
-</style>

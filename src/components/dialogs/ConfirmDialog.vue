@@ -23,7 +23,8 @@
 
 <script setup>
 const model = defineModel()
-defineEmits(['confirm'])
+
+const emit = defineEmits(['confirm'])
 
 defineProps({
   title: { type: String, default: 'Confirm' },

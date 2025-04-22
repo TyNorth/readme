@@ -24,17 +24,30 @@
     </q-card>
 
     <ThemedSection title="Chapters" icon="sym_o_library_books">
-      <q-list separator>
-        <q-item v-for="chapter in chapters" :key="chapter.id" clickable>
-          <q-item-section>
-            <q-item-label>{{ chapter.title }}</q-item-label>
-            <q-item-label caption>Chapter {{ chapter.number }}</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-btn flat dense round icon="sym_o_edit" @click.stop="editChapter(chapter)" />
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <div v-if="chapters.length">
+        <q-list separator>
+          <q-item v-for="chapter in chapters" :key="chapter.id" clickable>
+            <q-item-section>
+              <q-item-label>{{ chapter.title }}</q-item-label>
+              <q-item-label caption>Chapter {{ chapter.number }}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn flat dense round icon="sym_o_edit" @click.stop="editChapter(chapter)" />
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </div>
+
+      <div v-else class="q-pa-md text-center">
+        <q-icon name="sym_o_library_books" size="32px" color="grey-5" class="q-mb-sm" />
+        <div class="text-grey-5 q-mb-sm">No chapters yet</div>
+        <q-btn
+          color="primary"
+          icon="sym_o_edit_document"
+          label="Go to Chapters"
+          @click="goToEditor"
+        />
+      </div>
     </ThemedSection>
 
     <ThemedSubmitBar label="Save Story" :loading="saving" @submit="save" :icon="`sym_o_save`" />
@@ -94,5 +107,9 @@ async function save() {
 
 function editChapter(chapter) {
   router.push(`/editor/${story.value.id}?chapterId=${chapter.id}`)
+}
+
+function goToEditor() {
+  router.push(`/editor/${storyId}`)
 }
 </script>

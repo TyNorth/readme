@@ -4,7 +4,12 @@
       <q-toolbar>
         <q-toolbar-title>📖 LoreLight</q-toolbar-title>
         <q-btn flat label="Explore" to="/explore" />
-        <q-btn flat label="My Universes" :to="`/my-universes/${userStore.profile?.id}`" />
+        <q-btn
+          v-if="userStore.profile?.id"
+          flat
+          label="My Universes"
+          :to="`/my-universes/${userStore.profile?.id}`"
+        />
 
         <q-space />
 
@@ -20,6 +25,7 @@
         />
 
         <q-btn flat icon="sym_o_account_circle" to="/profile" />
+        <q-btn dense flat icon="sym_o_logout" @click="endSession" />
 
         <q-btn
           round
@@ -50,15 +56,21 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user-store'
 import { useReaderOptionsStore } from '@/stores/reader-options-store'
 import { Dark } from 'quasar'
 import { useRouter } from 'vue-router'
 import AppBreadcrumbs from '@/components/nav/AppBreadcrumbs.vue'
+import { useAuth } from 'src/composables/useAuth'
 
 const store = useReaderOptionsStore()
 const router = useRouter()
+const auth = useAuth()
+
+async function endSession() {
+  await auth.logout()
+}
 
 const themeIcon = computed(() => {
   return store.theme === 'dark' ? 'sym_o_light_mode' : 'sym_o_dark_mode'
@@ -66,9 +78,6 @@ const themeIcon = computed(() => {
 
 const themeColor = computed(() => {
   return store.theme === 'dark' ? 'white' : 'black'
-})
-const toggleThemeColor = computed(() => {
-  return store.theme === 'dark' ? 'secondary' : 'accent'
 })
 
 function toggleTheme() {
@@ -84,5 +93,11 @@ const userStore = useUserStore()
 const creatorMode = computed({
   get: () => userStore.creatorMode,
   set: (val) => userStore.setCreatorMode(val),
+})
+
+onMounted(async () => {
+  if (!userStore.authUser || !userStore.profile) {
+    await userStore.initialize()
+  }
 })
 </script>

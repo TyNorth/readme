@@ -7,6 +7,7 @@
         <!-- Right-aligned theme toggle -->
         <q-space />
         <q-btn round dense flat :icon="themeIcon" :color="toggleColor" @click="toggleTheme" />
+        <q-btn dense flat icon="sym_o_logout" @click="endSession" />
       </q-toolbar>
     </q-header>
 
@@ -22,6 +23,7 @@
 import { computed } from 'vue'
 import { useReaderOptionsStore } from '@/stores/reader-options-store'
 import { Dark } from 'quasar'
+import { useAuth } from 'src/composables/useAuth'
 
 const store = useReaderOptionsStore()
 
@@ -32,6 +34,11 @@ const themeClass = computed(() => {
 const toggleColor = computed(() => (store.theme === 'dark' ? 'white' : 'black'))
 
 const themeIcon = computed(() => (store.theme === 'dark' ? 'sym_o_light_mode' : 'sym_o_dark_mode'))
+const auth = useAuth()
+
+async function endSession() {
+  await auth.logout()
+}
 
 function toggleTheme() {
   store.theme = store.theme === 'dark' ? 'light' : 'dark'

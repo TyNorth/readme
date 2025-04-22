@@ -19,7 +19,12 @@
       <q-spinner size="32px" color="primary" />
     </div>
 
-    <StoryListView v-if="viewMode === 'list'" :stories="stories" @edit="editStory" />
+    <StoryListView
+      v-if="viewMode === 'list'"
+      :stories="stories"
+      @edit="editStory"
+      @view="goToOverview"
+    />
     <StoryCardGridView v-if="viewMode === 'card'" :stories="stories" @edit="editStory" />
     <StoryTimelineView v-if="viewMode === 'timeline'" :stories="stories" @edit="editStory" />
 
@@ -58,7 +63,7 @@ const viewMode = ref('list')
 
 onMounted(async () => {
   loading.value = true
-  const { data, error } = await supabase.from('stories').select('*').eq('universe_id', universeId)
+  const { data } = await supabase.from('stories').select('*').eq('universe_id', universeId)
 
   stories.value = data || []
   loading.value = false

@@ -45,6 +45,7 @@ const props = defineProps({
   chapters: Array,
   currentChapterId: String,
 })
+console.log(`props log: ${props}`)
 
 const emit = defineEmits(['select'])
 

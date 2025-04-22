@@ -4,7 +4,9 @@
       <!-- Title -->
       <template #body-cell-title="props">
         <q-td>
-          <div class="text-subtitle2 text-gold">{{ props.row.title }}</div>
+          <div @click="gotToChapterOverview" class="text-subtitle2 text-gold">
+            {{ props.row.title }}
+          </div>
           <div class="text-caption text-grey-5">{{ props.row.summary }}</div>
         </q-td>
       </template>

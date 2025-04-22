@@ -42,7 +42,6 @@ export const useUserStore = defineStore('user', {
       this.loading = true
       try {
         const data = await getUserProfile(userId)
-        console.log(`data: ${data}`)
         this.profile = data
         this.creatorMode = data?.creator_enabled || false
       } catch (err) {

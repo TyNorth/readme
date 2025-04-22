@@ -3,7 +3,6 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
       {
@@ -32,6 +31,7 @@ const routes = [
           breadcrumb: 'Profile',
           icon: 'sym_o_profile',
           dynamic: 'profile',
+          requiresAuth: true,
         },
       },
       {
@@ -47,9 +47,9 @@ const routes = [
         path: 'universe/:universeId/character/:characterId',
         component: () => import('pages/universe/CharacterPage.vue'),
         meta: {
-          breadcrumb: 'Universe :universeId',
-          icon: 'sym_o_planet',
-          dynamic: 'universe',
+          breadcrumb: 'Character',
+          icon: 'sym_o_person',
+          dynamic: 'character',
         },
       },
       {
@@ -69,7 +69,7 @@ const routes = [
     },
   },
 
-  // Auth (Login/Register)
+  // Auth
   {
     path: '/auth',
     component: () => import('layouts/AuthLayout.vue'),
@@ -79,10 +79,11 @@ const routes = [
     ],
   },
 
-  // Universe Builder Section
+  // Universe Builder
   {
     path: '/universe/:id',
     component: () => import('layouts/UniverseLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       { path: '', redirect: 'overview' },
       {
@@ -112,17 +113,15 @@ const routes = [
           dynamic: 'story_overview',
         },
       },
-
       {
         path: 'characters',
         component: () => import('src/pages/universe/CharactersDashboard.vue'),
         meta: {
           breadcrumb: 'Characters',
           icon: 'sym_o_group3',
-          dynamic: 'characters_dasboard',
+          dynamic: 'characters_dashboard',
         },
       },
-
       {
         path: 'lore',
         component: () => import('src/pages/universe/LoreDashboard.vue'),
@@ -134,9 +133,9 @@ const routes = [
       },
       {
         path: 'map',
-        component: () => import('pages/universe/Map.vue'),
+        component: () => import('src/pages/universe/MapPage.vue'),
         meta: {
-          breadcrumb: 'Explore',
+          breadcrumb: 'Map',
           icon: 'sym_o_explore',
         },
       },
@@ -147,28 +146,30 @@ const routes = [
   {
     path: '/editor/:storyId',
     component: () => import('layouts/EditorLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
         component: () => import('pages/editor/StoryEditor.vue'),
         meta: {
-          breadcrumb: 'Explore',
+          breadcrumb: 'Story Editor',
           icon: 'sym_o_explore',
         },
       },
       {
-        path: '/editor/:storyId/chapter/:chapterId',
+        path: 'chapter/:chapterId',
         component: () => import('pages/editor/ChapterEditor.vue'),
         meta: {
           breadcrumb: 'Chapter Editor',
           icon: 'sym_o_edit_document',
           dynamic: 'chapter_editor',
+          requiresAuth: true,
         },
       },
     ],
   },
 
-  // Reader Immersion Mode
+  // Reader Mode
   {
     path: '/read/:storyId',
     component: () => import('layouts/ReaderLayout.vue'),
@@ -177,14 +178,14 @@ const routes = [
         path: '',
         component: () => import('pages/reader/ReaderPage.vue'),
         meta: {
-          breadcrumb: 'Explore',
-          icon: 'sym_o_explore',
+          breadcrumb: 'Reader',
+          icon: 'sym_o_menu_book',
         },
       },
     ],
   },
 
-  // 404 Catch-All
+  // 404
   {
     path: '/:catchAll(.*)*',
     component: () => import('layouts/MainLayout.vue'),
@@ -193,8 +194,8 @@ const routes = [
         path: '',
         component: () => import('pages/ErrorNotFound.vue'),
         meta: {
-          breadcrumb: 'Explore',
-          icon: 'sym_o_explore',
+          breadcrumb: 'Not Found',
+          icon: 'sym_o_error',
         },
       },
     ],

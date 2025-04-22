@@ -28,7 +28,7 @@ import { computed, ref } from 'vue'
 const model = defineModel()
 const emit = defineEmits(['select'])
 
-defineProps({
+const props = defineProps({
   entries: Array,
 })
 

@@ -138,13 +138,12 @@ const map = ref(null)
 
 const activeTab = ref('about')
 const selectedLore = ref(null)
-const selectedCharacter = ref(null)
 
-const handleCharacterSelection = (char, e) => {
+const handleCharacterSelection = (char) => {
   // insert nagivation here
   router.push(`/universe/${universeId}/character/${char.id}`)
 }
-const handleLoreSelection = (lore, e) => {
+const handleLoreSelection = (lore) => {
   // insert nagivation here
   router.push(`/universe/${universeId}/lore/${lore.id}`)
 }

@@ -4,25 +4,25 @@
       <q-toolbar>
         <q-toolbar-title>{{ universeTitle }}</q-toolbar-title>
         <q-space />
-        <q-btn dense flat icon="sym_o_logout" @click="logout" />
+        <q-btn dense flat icon="sym_o_logout" @click="endSession" />
       </q-toolbar>
     </q-header>
 
     <q-drawer show-if-above>
       <q-list>
-        <q-item clickable to="overview">
+        <q-item clickable :to="`/universe/${universeId}/overview`">
           <q-item-section>Overview</q-item-section>
         </q-item>
-        <q-item clickable to="stories">
+        <q-item clickable :to="`/universe/${universeId}/stories`">
           <q-item-section>Stories</q-item-section>
         </q-item>
-        <q-item clickable to="characters">
+        <q-item clickable :to="`/universe/${universeId}/characters`">
           <q-item-section>Characters</q-item-section>
         </q-item>
-        <q-item clickable to="lore">
+        <q-item clickable :to="`/universe/${universeId}/lore`">
           <q-item-section>Lore</q-item-section>
         </q-item>
-        <q-item clickable to="map">
+        <q-item clickable :to="`/universe/${universeId}/map`">
           <q-item-section>Map</q-item-section>
         </q-item>
       </q-list>
@@ -37,8 +37,14 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { useUniverseStore } from '@/stores/universe-store'
+import { useAuth } from 'src/composables/useAuth'
 const { universes } = useUniverseStore()
 const route = useRoute()
-const universeId = route.params.id
+const universeId = route.params.universe_id || route.params.id
 const universeTitle = universes.find((u) => u.id === universeId)?.title || 'Universe'
+const auth = useAuth()
+
+async function endSession() {
+  await auth.logout()
+}
 </script>
