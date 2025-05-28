@@ -22,9 +22,6 @@
         <q-item clickable :to="`/universe/${universeId}/lore`">
           <q-item-section>Lore</q-item-section>
         </q-item>
-        <q-item clickable :to="`/universe/${universeId}/map`">
-          <q-item-section>Map</q-item-section>
-        </q-item>
       </q-list>
     </q-drawer>
 

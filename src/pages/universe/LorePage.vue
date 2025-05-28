@@ -70,21 +70,6 @@
             </q-list>
           </div>
 
-          <div v-if="linkedMaps.length" class="q-mt-md">
-            <div class="text-caption text-grey-5 q-mb-xs">Maps:</div>
-            <q-list>
-              <q-item
-                v-for="map in linkedMaps"
-                :key="map.id"
-                clickable
-                :to="`/universe/${universeId}/map/${map.id}`"
-                class="q-py-xs"
-              >
-                <q-item-section>{{ map.name }}</q-item-section>
-              </q-item>
-            </q-list>
-          </div>
-
           <q-btn
             v-if="isMobile"
             flat
@@ -131,20 +116,17 @@ const showSidebar = computed(() => !isMobile.value || drawerOpen.value)
 const loreEntry = ref(null)
 const universe = ref(null)
 const characters = ref([])
-const maps = ref([])
 
 onMounted(async () => {
-  const [{ data: lore }, { data: u }, { data: c }, { data: m }] = await Promise.all([
+  const [{ data: lore }, { data: u }, { data: c }] = await Promise.all([
     supabase.from('lore_entries').select('*').eq('id', loreId).single(),
     supabase.from('universes').select('id, title').eq('id', universeId).single(),
     supabase.from('characters').select('id, name').eq('universe_id', universeId),
-    supabase.from('maps').select('id, name').eq('universe_id', universeId),
   ])
 
   loreEntry.value = lore
   universe.value = u
   characters.value = c || []
-  maps.value = m || []
 })
 
 const linkedCharacters = computed(() =>
@@ -153,17 +135,10 @@ const linkedCharacters = computed(() =>
   ),
 )
 
-const linkedMaps = computed(() =>
-  maps.value.filter((map) =>
-    loreEntry.value?.content?.toLowerCase().includes(map.name.toLowerCase()),
-  ),
-)
-
 const linkedContent = computed(() => {
   return parseLoreContent({
     rawText: loreEntry.value?.content,
     characters: characters.value,
-    maps: maps.value,
     universeId,
   })
 })

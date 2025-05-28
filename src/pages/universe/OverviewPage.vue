@@ -73,14 +73,6 @@
           @click="$router.push(`/universe/${universe.id}/lore`)"
         />
       </div>
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <DashboardLinkCard
-          title="Maps"
-          subtitle="Explore and link locations"
-          icon="sym_o_map"
-          @click="$router.push(`/universe/${universe.id}/map`)"
-        />
-      </div>
     </div>
   </q-page>
 </template>

@@ -131,14 +131,6 @@ const routes = [
           dynamic: 'lore_dashboard',
         },
       },
-      {
-        path: 'map',
-        component: () => import('src/pages/universe/MapPage.vue'),
-        meta: {
-          breadcrumb: 'Map',
-          icon: 'sym_o_explore',
-        },
-      },
     ],
   },
 

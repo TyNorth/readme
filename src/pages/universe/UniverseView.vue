@@ -43,7 +43,6 @@
       <q-tab name="stories" label="Stories" icon="sym_o_menu_book" />
       <q-tab name="lore" label="Lore" icon="sym_o_auto_stories" />
       <q-tab name="characters" label="Characters" icon="sym_o_face" />
-      <q-tab name="map" label="Map" icon="sym_o_map" />
     </q-tabs>
 
     <q-separator spaced />
@@ -101,15 +100,6 @@
         class="col-4 col-sm-6 col-md-4 col-lg-3"
       />
     </div>
-
-    <div v-show="activeTab === 'map'" class="q-mt-md">
-      <MapCanvas
-        v-if="map"
-        :map="map"
-        @marker-click="(spot) => console.log('clicked marker', spot)"
-      />
-      <div v-else class="text-caption text-grey-5">Map not available.</div>
-    </div>
   </q-page>
 </template>
 
@@ -123,7 +113,6 @@ import SceneCard from '@/components/story/SceneCard.vue'
 import LoreEntry from '@/components/lore/LoreEntry.vue'
 import LorePopup from '@/components/lore/LorePopup.vue'
 import CharacterCard from '@/components/character/CharacterCard.vue'
-import MapCanvas from '@/components/map/MapCanvas.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -134,7 +123,6 @@ const bannerUrl = ref('')
 const stories = ref([])
 const lore = ref([])
 const characters = ref([])
-const map = ref(null)
 
 const activeTab = ref('about')
 const selectedLore = ref(null)
@@ -173,12 +161,5 @@ onMounted(async () => {
     .select('*')
     .eq('universe_id', 'a1a1a1a1-a1a1-4a1a-a1a1-a1a1a1a1a1a1')
   characters.value = c || []
-
-  const { data: m } = await supabase
-    .from('maps')
-    .select('*')
-    .eq('universe_id', universeId)
-    .maybeSingle()
-  map.value = m || null
 })
 </script>
