@@ -29,7 +29,9 @@ export const useUserStore = defineStore('user', {
 
         this.authUser = user
         if (this.authUser) {
-          //await this.fetchProfile(this.authUser.id)
+          await this.fetchProfile(this.authUser.id)
+        } else {
+          this.profile = null
         }
       } catch (err) {
         this.error = err
@@ -42,10 +44,12 @@ export const useUserStore = defineStore('user', {
       this.loading = true
       try {
         const data = await getUserProfile(userId)
+        console.log(data)
         this.profile = data
         this.creatorMode = data?.creator_enabled || false
       } catch (err) {
         this.error = err
+        this.profile = null
       } finally {
         this.loading = false
       }
@@ -57,6 +61,24 @@ export const useUserStore = defineStore('user', {
         this.profile = data
       } catch (err) {
         this.error = err
+      }
+    },
+
+    // *** Add a Logout Action (Example) ***
+    async logout() {
+      this.loading = true
+      try {
+        const { error } = await supabase.auth.signOut()
+        if (error) throw error
+        // Clear state
+        this.authUser = null
+        this.profile = null
+        this.creatorMode = false
+        this.error = null
+      } catch (err) {
+        this.error = err
+      } finally {
+        this.loading = false
       }
     },
 

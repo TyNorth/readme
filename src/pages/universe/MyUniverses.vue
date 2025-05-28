@@ -101,7 +101,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue' // Import computed
+import { ref, onMounted } from 'vue' // Import computed
 import { useUniverseStore } from '@/stores/universe-store'
 import { updateUniverse } from '@/supabase/universes'
 import { supabase } from '@/boot/supabase'

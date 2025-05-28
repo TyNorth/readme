@@ -12,21 +12,24 @@
         />
 
         <q-space />
+        <template v-if="userStore.profile">
+          <q-toggle
+            v-model="creatorMode"
+            label="Creator Mode"
+            color="secondary"
+            keep-color
+            checked-icon="sym_o_edit"
+            unchecked-icon="sym_o_auto_stories"
+          />
+        </template>
 
-        <!-- Creator Mode Toggle -->
-        <q-toggle
-          v-if="router.currentRoute.value.path == '/'"
-          v-model="creatorMode"
-          label="Creator Mode"
-          color="secondary"
-          keep-color
-          checked-icon="sym_o_edit"
-          unchecked-icon="sym_o_auto_stories"
-        />
-
-        <q-btn flat icon="sym_o_account_circle" to="/profile" />
-        <q-btn dense flat icon="sym_o_logout" @click="endSession" />
-
+        <template v-if="userStore.profile">
+          <q-btn flat icon="sym_o_account_circle" to="/profile" aria-label="Profile" />
+          <q-btn dense flat icon="sym_o_logout" @click="endSession" aria-label="Logout" />
+        </template>
+        <template v-else>
+          <q-btn flat icon="sym_o_login" label="Login" @click="goToLogin" />
+        </template>
         <q-btn
           round
           dense
@@ -35,6 +38,7 @@
           :color="themeColor"
           :icon="themeIcon"
           @click="toggleTheme"
+          aria-label="Toggle Theme"
         />
       </q-toolbar>
       <q-toolbar
@@ -59,7 +63,7 @@
 import { computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user-store'
 import { useReaderOptionsStore } from '@/stores/reader-options-store'
-import { Dark } from 'quasar'
+import { Dark, Notify } from 'quasar' // Import Notify for feedback
 import { useRouter } from 'vue-router'
 import AppBreadcrumbs from '@/components/nav/AppBreadcrumbs.vue'
 import { useAuth } from 'src/composables/useAuth'
@@ -67,10 +71,26 @@ import { useAuth } from 'src/composables/useAuth'
 const store = useReaderOptionsStore()
 const router = useRouter()
 const auth = useAuth()
+const userStore = useUserStore() // Ensure userStore is defined
 
 async function endSession() {
-  console.log('logging out!')
-  await auth.logout()
+  console.log('logging out via store!')
+  await userStore.logout() // <-- Use the store's action
+  Notify.create({ type: 'positive', message: 'Logged out successfully.' })
+  router.push('/') // Redirect to home
+}
+
+async function goToLogin() {
+  await userStore.logout()
+  console.log('goToLogin called.')
+  console.log('Current user profile:', userStore.profile)
+  console.log('Navigating to /auth/login...')
+  try {
+    router.push('/auth/login')
+    console.log('router.push completed.')
+  } catch (error) {
+    console.error('Error during router.push:', error)
+  }
 }
 
 const themeIcon = computed(() => {
@@ -88,7 +108,6 @@ function toggleTheme() {
   document.body.classList.add(`theme-${store.theme}`)
   store.persist()
 }
-const userStore = useUserStore()
 
 // Two-way bind using Pinia state + action
 const creatorMode = computed({
@@ -97,8 +116,22 @@ const creatorMode = computed({
 })
 
 onMounted(async () => {
-  if (!userStore.authUser || !userStore.profile) {
+  // Ensure the user state is checked/loaded when the layout mounts
+  if (!userStore.authUser) {
     await userStore.initialize()
   }
+  // Set initial theme
+  Dark.set(store.theme === 'dark')
+  document.body.classList.add(`theme-${store.theme}`)
 })
 </script>
+
+<style scoped>
+/* Optional: Add some spacing if needed */
+.q-toolbar .q-btn {
+  margin: 0 4px;
+}
+.q-toolbar .q-toggle {
+  margin: 0 8px;
+}
+</style>
