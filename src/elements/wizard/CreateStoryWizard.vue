@@ -45,6 +45,7 @@ import ThemedTextarea from '@/elements/common/ThemedTextarea.vue'
 import ThemedSelect from '@/elements/common/ThemedSelect.vue'
 import ThemedSubmitBar from '@/elements/common/ThemedSubmitBar.vue'
 import { useRouter } from 'vue-router'
+import { notifyError } from 'src/utils/notify'
 
 const open = defineModel() // controlled from parent
 const emit = defineEmits(['created'])
@@ -66,13 +67,20 @@ async function submit() {
   try {
     const { data, error } = await supabase.from('stories').insert([form.value]).select().single()
 
-    if (error) throw error
+    if (error) {
+      console.log(error)
+      notifyError('Error creating story')
+    }
 
     emit('created', data)
     open.value = false
 
     // 🔁 Navigate to story editor
-    router.push(`/editor/${data.id}`)
+    if (data.id) {
+      router.push(`/editor/${data.id}`)
+    } else {
+      console.log(JSON.stringify(data))
+    }
   } catch (err) {
     console.error('Create Story Error:', err)
   } finally {

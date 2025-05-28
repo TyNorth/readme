@@ -69,6 +69,7 @@ const router = useRouter()
 const auth = useAuth()
 
 async function endSession() {
+  console.log('logging out!')
   await auth.logout()
 }
 

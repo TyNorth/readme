@@ -44,7 +44,6 @@
 import { ref, onMounted, watch, onBeforeUnmount, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '@/boot/supabase'
-import { debounce } from 'lodash-es'
 
 import InlineEditableText from '@/components/universe/dashboard/InlineEditableText.vue'
 import InlineEditableTextarea from '@/components/universe/dashboard/InlineEditableTextarea.vue'
@@ -127,7 +126,7 @@ onMounted(async () => {
   chapter.value = c
 })
 
-// Debounced auto-save
+/* Debounced auto-save
 const autoSave = debounce(async () => {
   if (!chapter.value.id) return
 
@@ -149,13 +148,13 @@ const autoSave = debounce(async () => {
     console.error('Auto Save Error:', error)
   }
 }, 5000)
-
+*/
 // Watchers
 watch(
   () => chapter.value.title,
   (newVal, oldVal) => {
     if (newVal !== oldVal) {
-      autoSave()
+      manualSave()
     }
   },
 )
@@ -164,7 +163,7 @@ watch(
   () => chapter.value.text,
   (newVal, oldVal) => {
     if (newVal !== oldVal) {
-      autoSave()
+      manualSave()
     }
   },
 )

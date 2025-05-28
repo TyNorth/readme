@@ -4,7 +4,7 @@ import {
   getUniversesForUser,
   updateUniverse,
   getUniverseById,
-} from '@/supabase/universes'
+} from 'src/supabase/universes'
 
 export const useUniverseStore = defineStore('universes', {
   state: () => ({

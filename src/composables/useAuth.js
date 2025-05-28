@@ -1,9 +1,11 @@
 import { ref } from 'vue'
 import { signInWithEmail, signUpWithEmail, signOut, getSession } from '@/supabase/auth'
+import { useRouter } from 'vue-router'
 
 export function useAuth() {
   const session = ref(null)
   const error = ref(null)
+  const router = useRouter()
 
   async function login(email, password) {
     try {
@@ -26,6 +28,7 @@ export function useAuth() {
   async function logout() {
     try {
       await signOut()
+      router.push('/auth/login')
       session.value = null
     } catch (err) {
       error.value = err

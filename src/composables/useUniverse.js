@@ -32,5 +32,9 @@ export function useUniverse() {
     return await createUniverse(payload)
   }
 
-  return { universes, loading, error, fetchPublic, fetchForUser, create }
+  async function addUniverse(universe) {
+    this.universes.push(universe)
+  }
+
+  return { universes, loading, error, fetchPublic, fetchForUser, create, addUniverse }
 }

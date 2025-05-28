@@ -1,11 +1,7 @@
 import { supabase } from 'src/boot/supabase'
 
 export async function getUniversesForUser(userId) {
-  const { data: u, error } = await supabase
-    .from('universes')
-    .select('*')
-    .eq('owner_id', userId)
-    .single()
+  const { data: u, error } = await supabase.from('universes').select('*').eq('owner_id', userId)
 
   if (error) throw error
   return u
