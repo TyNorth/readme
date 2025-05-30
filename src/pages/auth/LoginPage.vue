@@ -74,7 +74,7 @@ async function login() {
   error.value = ''
   try {
     const session = await authLogin(email.value, password.value)
-    console.log(session)
+    if (session) console.info(`Session successfully started!`)
     await userStore.fetchProfile(session.user.id)
     notifySuccess('Login successful. Redirecting...')
     router.push('/explore')

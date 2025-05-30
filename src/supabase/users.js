@@ -1,12 +1,7 @@
 import { supabase } from 'src/boot/supabase'
 
 export async function getUserProfile(userId) {
-  // *** FIX: Change 'id' to 'user_id' ***
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('user_id', userId) // <--- CORRECTED
-    .single()
+  const { data, error } = await supabase.from('users').select('*').eq('user_id', userId).single()
 
   // It's good practice to not throw an error if no row is found (PGRST116),
   // as a profile might simply not exist yet.
@@ -15,16 +10,16 @@ export async function getUserProfile(userId) {
     throw error
   }
 
-  console.log('Fetched Profile Data:', data) // Keep this log for now!
+  if (data) console.info(`user profile data loaded successfully!`)
+
   return data
 }
 
 export async function updateUserProfile(userId, updates) {
-  // *** FIX: Change 'id' to 'user_id' ***
   const { data, error } = await supabase
     .from('users')
     .update(updates)
-    .eq('user_id', userId) // <--- CORRECTED
+    .eq('user_id', userId)
     .select()
     .single()
 

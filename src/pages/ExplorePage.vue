@@ -74,7 +74,7 @@ const moods = ['Whimsical', 'Dark', 'Hopeful', 'Epic', 'Melancholic']
 
 onMounted(async () => {
   await universeStore.fetchPublicUniverses()
-  console.log(universeStore.universes)
+  if (universeStore.universes) console.info(`Universes loaded!`)
 })
 
 const filteredUniverses = computed(() => {

@@ -6,6 +6,21 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
       {
+        path: 'admin', // Parent path for admin section
+        component: () => import('layouts/AdminLayout.vue'), // Optional: A dedicated Admin Layout
+        meta: { requiresAuth: true, requiresAdmin: true }, // Add requiresAdmin meta
+        children: [
+          { path: '', redirect: '/admin/account-requests' }, // Default admin page
+          {
+            path: 'account-requests',
+            name: 'AdminAccountRequests',
+            component: () => import('pages/admin/AccountRequestsPage.vue'),
+            meta: { breadcrumb: 'Account Requests' }, // For breadcrumbs if you use them
+          },
+          // Add more admin routes here later if needed
+        ],
+      },
+      {
         path: 'explore',
         component: () => import('pages/ExplorePage.vue'),
         meta: {
@@ -75,7 +90,7 @@ const routes = [
     component: () => import('layouts/AuthLayout.vue'),
     children: [
       { path: 'login', component: () => import('pages/auth/LoginPage.vue') },
-      { path: 'register', component: () => import('pages/auth/RegisterPage.vue') },
+      { path: 'register', component: () => import('src/pages/auth/RequestAccountPage.vue') },
     ],
   },
 

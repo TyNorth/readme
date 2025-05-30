@@ -2,7 +2,7 @@
   <div class="editable-tags row items-center q-gutter-sm">
     <div v-if="!editing" class="row items-center q-gutter-xs">
       <q-chip
-        v-for="tag in modelValue"
+        v-for="tag in localTags"
         :key="tag"
         dense
         size="sm"
@@ -12,7 +12,18 @@
       >
         {{ tag }}
       </q-chip>
-      <q-btn flat round dense icon="sym_o_lock" size="sm" @click="editing = true" />
+      <q-chip v-if="!localTags.length && !editing" dense size="sm" outline color="grey-6">
+        No tags
+      </q-chip>
+      <q-btn
+        flat
+        round
+        dense
+        icon="sym_o_edit"
+        size="sm"
+        @click="startEditing"
+        aria-label="Edit tags"
+      />
     </div>
 
     <div v-else class="row items-center q-gutter-xs full-width">
@@ -22,9 +33,11 @@
         filled
         label="New tag"
         @keyup.enter="addTag"
-        class="q-mb-none"
+        class="q-mb-none col-auto"
+        style="min-width: 100px; flex-grow: 1"
+        :dark="$q.dark.isActive"
       />
-      <q-btn flat round dense icon="sym_o_add" size="sm" @click="addTag" />
+      <q-btn flat round dense icon="sym_o_add" size="sm" @click="addTag" aria-label="Add tag" />
 
       <q-chip
         v-for="tag in localTags"
@@ -40,13 +53,21 @@
         {{ tag }}
       </q-chip>
 
-      <q-btn flat round dense icon="sym_o_lock_open" size="sm" @click="finish" />
+      <q-btn
+        flat
+        round
+        dense
+        icon="sym_o_check"
+        size="sm"
+        @click="finishEditing"
+        aria-label="Finish editing tags"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -58,14 +79,38 @@ const emit = defineEmits(['update:modelValue'])
 
 const editing = ref(false)
 const input = ref('')
-const localTags = ref([...props.modelValue])
 
+// **FIX 1: Safe initialization of localTags**
+// Ensure localTags is always an array, even if modelValue is initially null or undefined.
+const localTags = ref([])
+
+// Function to synchronize localTags with props.modelValue safely
+function syncLocalTags() {
+  localTags.value = Array.isArray(props.modelValue) ? [...props.modelValue] : []
+}
+
+// **FIX 2: Watch for external changes and update localTags safely**
 watch(
   () => props.modelValue,
-  (val) => {
-    localTags.value = [...val]
+  (newVal) => {
+    // Only update if the external value is truly different from our internal copy
+    // This helps prevent potential infinite loops if parent updates are not perfectly managed
+    if (JSON.stringify(newVal) !== JSON.stringify(localTags.value)) {
+      syncLocalTags()
+    }
   },
+  { deep: true }, // Watch for changes within the array if the parent mutates it
 )
+
+// Initialize on mount
+onMounted(() => {
+  syncLocalTags()
+})
+
+function startEditing() {
+  syncLocalTags() // Ensure localTags is up-to-date before editing
+  editing.value = true
+}
 
 function addTag() {
   const value = input.value.trim()
@@ -79,8 +124,19 @@ function removeTag(tag) {
   localTags.value = localTags.value.filter((t) => t !== tag)
 }
 
-function finish() {
+function finishEditing() {
+  // Emit a new array copy to ensure reactivity for the parent
+  emit('update:modelValue', [...localTags.value])
   editing.value = false
-  emit('update:modelValue', localTags.value)
 }
 </script>
+
+<style scoped>
+.editable-tags .q-chip {
+  margin-top: 2px; /* Ensure chips have a bit of space if they wrap */
+  margin-bottom: 2px;
+}
+.editable-tags .q-input {
+  margin-right: 4px; /* Spacing before add button */
+}
+</style>

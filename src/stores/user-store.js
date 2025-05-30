@@ -44,7 +44,7 @@ export const useUserStore = defineStore('user', {
       this.loading = true
       try {
         const data = await getUserProfile(userId)
-        console.log(data)
+        if (data) console.info(`fetch profile successful!`)
         this.profile = data
         this.creatorMode = data?.creator_enabled || false
       } catch (err) {

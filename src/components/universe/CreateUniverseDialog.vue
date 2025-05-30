@@ -71,6 +71,7 @@ import { Notify } from 'quasar'
 const props = defineProps({
   modelValue: Boolean,
 })
+console.log(props)
 const emit = defineEmits(['update:modelValue', 'created'])
 
 const userStore = useUserStore()
