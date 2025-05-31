@@ -1,161 +1,153 @@
 <template>
-  <q-page class="q-pa-md character-detail-page">
-    <!-- Header Section -->
-    <div class="hero-section row items-center q-gutter-xl">
-      <div class="portrait-frame">
-        <q-img
-          v-if="character?.portrait_url"
-          :src="character.portrait_url"
-          alt="portrait"
-          ratio="2/3"
-          class="portrait-img"
-        />
-        <div v-else class="portrait-placeholder flex flex-center column">
-          <q-icon name="sym_o_face" size="56px" color="grey-6" />
-          <div class="text-caption text-grey-5">No portrait</div>
-        </div>
-      </div>
-
-      <div class="column flex justify-between">
-        <div class="text-h4 text-shimmer">{{ character?.name }}</div>
-        <div class="text-subtitle2 text-italic text-grey-5">{{ character?.alias }}</div>
-
-        <div class="q-mt-sm row q-gutter-sm">
-          <q-chip
-            v-for="tag in character?.tags || []"
-            :key="tag"
-            dense
-            color="primary"
-            text-color="white"
-            icon="sym_o_loyalty"
-          >
-            {{ tag }}
-          </q-chip>
-        </div>
-      </div>
+  <q-page class="q-pa-md">
+    <div class="row items-center justify-between q-mb-md">
+      <div class="text-h5 text-gold">Characters</div>
+      <q-btn-toggle
+        v-model="viewMode"
+        dense
+        flat
+        toggle-color="primary"
+        :options="[
+          { value: 'list', icon: 'sym_o_view_list' },
+          { value: 'card', icon: 'sym_o_view_module' },
+        ]"
+      />
     </div>
 
-    <!-- Voice Sample -->
-    <q-card flat bordered class="q-mt-md q-pa-md bg-grey-9 text-white text-center">
-      <template v-if="character?.voice_sample_url">
-        <audio controls :src="character?.voice_sample_url" />
-      </template>
-      <template v-else>
-        <q-icon name="sym_o_volume_off" size="md" class="q-mb-sm text-grey-5" />
-        <div class="text-caption text-grey-5">No voice sample available</div>
-      </template>
-    </q-card>
+    <div v-if="loading" class="flex flex-center q-my-xl">
+      <q-spinner size="32px" color="primary" />
+    </div>
 
-    <!-- Bio Section -->
-    <q-card flat bordered class="q-pa-md q-my-md bg-grey-9 text-white">
-      <div class="text-subtitle2 text-gold q-mb-sm">Biography</div>
-      <div class="text-body2 text-grey-4" style="white-space: pre-line">
-        {{ character?.bio || "This character's backstory is still unfolding..." }}
+    <div v-else-if="!loading && characters.length === 0" class="text-center q-pa-xl">
+      <q-icon name="sym_o_no_accounts" size="48px" color="grey-6" />
+      <div class="text-h6 text-grey-5 q-mt-md">No Characters Yet</div>
+      <div class="text-caption text-grey-6 q-mb-lg">
+        Start by adding your first character to this universe!
       </div>
-    </q-card>
+      <q-btn
+        color="primary"
+        icon="sym_o_person_add"
+        label="Create First Character"
+        @click="drawerOpen = true"
+      />
+    </div>
 
-    <q-card v-if="quote" flat bordered class="q-pa-md bg-grey-9 text-gold text-italic q-mt-md">
-      “{{ quote }}”
-    </q-card>
+    <template v-else>
+      <CharacterListView
+        v-if="viewMode === 'list'"
+        :characters="characters"
+        @edit="openEditDrawer"
+        @view-character="viewCharacterDetails"
+      />
+      <CharacterCardGridView
+        v-if="viewMode === 'card'"
+        :characters="characters"
+        @edit="openEditDrawer"
+        @view-character="viewCharacterDetails"
+      />
+    </template>
 
-    <!-- Origin, Role, Relationships -->
-    <q-card flat bordered class="q-pa-md q-my-md bg-grey-10 text-white">
-      <div class="q-gutter-md row">
-        <div class="col-12 col-sm-4">
-          <div class="text-subtitle2 text-gold q-mb-sm">Origin</div>
-          <div class="text-body2">{{ character?.origin_location || 'Unknown' }}</div>
-        </div>
+    <EditCharacterDrawer
+      v-model="editDrawerOpen"
+      :character="selectedCharacter"
+      @updated="handleCharacterUpdated"
+    />
 
-        <div class="col-12 col-sm-4">
-          <div class="text-subtitle2 text-gold q-mb-sm">Role</div>
-          <div class="text-body2">{{ character?.role_rank || 'Hero/Wizard' }}</div>
-          <!-- Placeholder -->
-        </div>
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn
+        fab
+        aria-label="Create New Character"
+        icon="sym_o_person_add"
+        color="primary"
+        @click="drawerOpen = true"
+      />
+    </q-page-sticky>
 
-        <div class="col-12 col-sm-4">
-          <div class="text-subtitle2 text-gold q-mb-sm">Relationships</div>
-          <div v-if="relationships.length">
-            <div v-for="(rel, i) in relationships" :key="i" class="text-caption q-mb-xs">
-              <strong>{{ rel.target }}</strong> — {{ rel.type }}
-            </div>
-          </div>
-          <div v-else class="text-grey-5">None recorded.</div>
-        </div>
-      </div>
-    </q-card>
+    <CreateCharacterDrawer
+      v-model="drawerOpen"
+      :universe-id="universeId"
+      @created="handleCharacterCreated"
+    />
   </q-page>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router' // Import useRouter
 import { supabase } from '@/boot/supabase'
+import { Notify } from 'quasar' // Import Notify for feedback
+import CreateCharacterDrawer from 'src/components/universe/dashboard/CreateCharacterDrawer.vue'
+import EditCharacterDrawer from 'src/components/universe/dashboard/EditCharacterDrawer.vue'
+import CharacterListView from '@/components/universe/dashboard/CharacterListView.vue'
+import CharacterCardGridView from '@/components/universe/dashboard/CharacterCardGridView.vue'
 
 const route = useRoute()
-const characterId = route.params.characterId
-const character = ref(null)
-const quote = ref(null)
+const router = useRouter() // Initialize router
+const universeId = route.params.id
 
-const loadQuote = async () => {
-  const { data, error } = await supabase
-    .from('chapter_lines')
-    .select('text')
-    .eq('speaker_id', characterId)
-    .limit(1)
+const characters = ref([])
+const loading = ref(false)
+const viewMode = ref('list') // Default view mode
 
-  if (!error && data?.length) {
-    quote.value = data[0].text
-  } else {
-    console.log(`no data`)
-  }
+const drawerOpen = ref(false) // For CreateCharacterDrawer
+const editDrawerOpen = ref(false) // For EditCharacterDrawer
+const selectedCharacter = ref(null)
+
+function openEditDrawer(character) {
+  selectedCharacter.value = character
+  editDrawerOpen.value = true
 }
 
-const relationships = computed(() => {
-  return character.value?.relationships || []
-})
+function handleCharacterUpdated(updatedCharacter) {
+  // Renamed from handleUpdated
+  const index = characters.value.findIndex((c) => c.id === updatedCharacter.id)
+  if (index !== -1) {
+    characters.value[index] = updatedCharacter
+  }
+  Notify.create({ type: 'positive', message: 'Character updated successfully!' })
+}
+
+function handleCharacterCreated(newCharacter) {
+  characters.value.unshift(newCharacter) // Add to the beginning for better UX
+  Notify.create({ type: 'positive', message: 'Character created successfully!' })
+}
+
+// Example function if your list/card views emit an event to navigate to character details
+function viewCharacterDetails(character) {
+  // Navigates to the CharacterPage.vue route
+  router.push(`/universe/${universeId}/character/${character.id}`)
+}
 
 onMounted(async () => {
-  const { data, error } = await supabase
-    .from('characters')
-    .select('*')
-    .eq('id', characterId)
-    .single()
+  loading.value = true
+  try {
+    const { data, error } = await supabase
+      .from('characters')
+      .select('*')
+      .eq('universe_id', universeId)
+      .order('name', { ascending: true }) // Example: order by name
 
-  if (!error) character.value = data
-  await loadQuote()
+    if (error) {
+      // Throw the error to be caught by the catch block
+      throw error
+    }
+    characters.value = data || []
+  } catch (err) {
+    console.error('Error fetching characters:', err)
+    Notify.create({
+      type: 'negative',
+      message: `Failed to load characters: ${err.message || 'Unknown error'}`,
+    })
+    characters.value = [] // Ensure characters is an empty array on error
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 
 <style scoped>
-.character-detail-page {
-  background-color: var(--q-dark-page);
-  color: white;
+.text-gold {
+  color: #c49a43; /* Or your theme's gold color */
 }
-
-.character-detail-page {
-  background-color: var(--q-dark-page);
-  color: white;
-}
-.hero-section {
-  margin-bottom: 2rem;
-}
-.portrait-frame {
-  width: 160px;
-  height: 240px;
-  overflow: hidden;
-  border-radius: 12px;
-  border: 2px solid var(--q-primary);
-  background: rgba(255, 255, 255, 0.04);
-}
-.portrait-img {
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-}
-.portrait-placeholder {
-  height: 100%;
-  background-color: #1e1e1e;
-  border-radius: inherit;
-  padding: 1rem;
-}
+/* Add any other specific styles for your dashboard here */
 </style>

@@ -37,7 +37,11 @@
       @click="createOpen = true"
     />
 
-    <CreateStoryWizard v-model="createOpen" @created="stories.push($event)" />
+    <CreateStoryWizard
+      v-model="createOpen"
+      @created="handleStoryCreated"
+      :current-universe-id="universeId"
+    />
   </q-page>
 </template>
 
@@ -60,6 +64,10 @@ const universeId = route.params.id
 const stories = ref([])
 const loading = ref(false)
 const viewMode = ref('list')
+
+function handleStoryCreated(newStory) {
+  stories.value.push(newStory)
+}
 
 onMounted(async () => {
   loading.value = true

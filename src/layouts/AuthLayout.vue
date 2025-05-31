@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf" :class="themeClass">
     <q-header :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-light text-black'">
       <q-toolbar>
-        <q-toolbar-title>📖 LoreLight</q-toolbar-title>
+        <q-toolbar-title>📖 LoreStrom</q-toolbar-title>
 
         <!-- Right-aligned theme toggle -->
         <q-space />

@@ -2,7 +2,7 @@
   <q-layout view="hHh lpR fFf">
     <q-header :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-light text-black'">
       <q-toolbar>
-        <q-toolbar-title>📖 LoreLight</q-toolbar-title>
+        <q-toolbar-title>📖 LoreStrom</q-toolbar-title>
 
         <q-btn flat :label="$q.screen.gt.xs ? 'Explore' : ''" icon="sym_o_explore" to="/explore" />
         <q-btn
@@ -24,7 +24,7 @@
 
         <q-space />
 
-        <template v-if="userStore.profile">
+        <template v-if="false">
           <q-toggle
             v-model="creatorMode"
             :label="$q.screen.gt.sm ? 'Creator Mode' : ''"
@@ -74,7 +74,7 @@
     </q-page-container>
 
     <q-footer class="bg-dark text-grey-5 q-pa-sm">
-      <div class="text-center">© {{ new Date().getFullYear() }} LoreLight</div>
+      <div class="text-center">© {{ new Date().getFullYear() }} LoreStrom</div>
     </q-footer>
   </q-layout>
 </template>

@@ -4,7 +4,7 @@
       <q-toolbar>
         <q-btn flat dense round icon="sym_o_menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
-        <q-toolbar-title> Lorelight Admin Panel </q-toolbar-title>
+        <q-toolbar-title> LoreStrom Admin Panel </q-toolbar-title>
 
         <q-btn
           flat
