@@ -30,6 +30,7 @@
     <CreateChapterDrawer
       v-model="chapterCreateOpen"
       :story-id="storyId"
+      :creator-id="creatorId"
       @created="chapters.push($event)"
     />
 
@@ -52,6 +53,7 @@ import InlineEditableText from '@/components/universe/dashboard/InlineEditableTe
 import InlineEditableTextarea from '@/components/universe/dashboard/InlineEditableTextarea.vue'
 import ThemedSection from '@/elements/common/ThemedSection.vue'
 import CreateChapterDrawer from '@/components/universe/dashboard/CreateChapterDrawer.vue'
+import { useUserStore } from 'src/stores/user-store'
 
 const route = useRoute()
 const router = useRouter()
@@ -60,8 +62,13 @@ const storyId = route.params.storyId
 const story = ref({ title: '', summary: '' })
 const chapters = ref([])
 const chapterCreateOpen = ref(false)
+const auth = useUserStore()
+
+const creatorId = ref(null)
 
 onMounted(async () => {
+  creatorId.value = auth.authUser.id
+  console.log(creatorId.value)
   const { data: s } = await supabase.from('stories').select('*').eq('id', storyId).single()
   if (s) story.value = s
 

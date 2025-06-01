@@ -103,6 +103,13 @@ const route = useRoute()
 const universeId = route.params.id
 const loading = ref(false)
 
+const props = defineProps({
+  creatorId: {
+    type: String,
+    default: null,
+  },
+})
+
 const form = ref({
   name: '',
   alias: '',
@@ -113,6 +120,7 @@ const form = ref({
   portrait_url: '',
   voice_sample_url: '',
   universe_id: universeId,
+  user_id: props.creatorId,
 })
 
 const portraitFile = ref(null)
@@ -145,6 +153,8 @@ async function submit() {
     if (voiceFile.value) {
       form.value.voice_sample_url = await uploadFile('voice_samples', voiceFile.value)
     }
+
+    console.log(`Creating character with payload: ${JSON.stringify(form.value)}`)
 
     const created = await createCharacter(form.value)
     emit('created', created)

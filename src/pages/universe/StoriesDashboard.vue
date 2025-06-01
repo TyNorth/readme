@@ -41,6 +41,7 @@
       v-model="createOpen"
       @created="handleStoryCreated"
       :current-universe-id="universeId"
+      :creator-id="authId"
     />
   </q-page>
 </template>
@@ -54,13 +55,14 @@ import StoryListView from '@/components/universe/dashboard/StoryListView.vue'
 import StoryCardGridView from '@/components/universe/dashboard/StoryCardGridView.vue'
 import StoryTimelineView from '@/components/universe/dashboard/StoryTimelineView.vue'
 import CreateStoryWizard from '@/elements/wizard/CreateStoryWizard.vue'
+import { useUserStore } from 'src/stores/user-store'
 
 const createOpen = ref(false)
-
+const auth = useUserStore()
 const route = useRoute()
 const router = useRouter()
 const universeId = route.params.id
-
+const authId = ref(false)
 const stories = ref([])
 const loading = ref(false)
 const viewMode = ref('list')
@@ -72,7 +74,8 @@ function handleStoryCreated(newStory) {
 onMounted(async () => {
   loading.value = true
   const { data } = await supabase.from('stories').select('*').eq('universe_id', universeId)
-
+  authId.value = await auth.authUser.id
+  console.log(authId.value)
   stories.value = data || []
   loading.value = false
 })

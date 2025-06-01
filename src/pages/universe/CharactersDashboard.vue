@@ -66,6 +66,7 @@
     <CreateCharacterDrawer
       v-model="drawerOpen"
       :universe-id="universeId"
+      :creator-id="creatorId"
       @created="handleCharacterCreated"
     />
   </q-page>
@@ -80,6 +81,7 @@ import CreateCharacterDrawer from 'src/components/universe/dashboard/CreateChara
 import EditCharacterDrawer from 'src/components/universe/dashboard/EditCharacterDrawer.vue'
 import CharacterListView from '@/components/universe/dashboard/CharacterListView.vue'
 import CharacterCardGridView from '@/components/universe/dashboard/CharacterCardGridView.vue'
+import { useUserStore } from 'src/stores/user-store'
 
 const route = useRoute()
 const router = useRouter() // Initialize router
@@ -92,7 +94,7 @@ const viewMode = ref('list') // Default view mode
 const drawerOpen = ref(false) // For CreateCharacterDrawer
 const editDrawerOpen = ref(false) // For EditCharacterDrawer
 const selectedCharacter = ref(null)
-
+const creatorId = ref(null)
 function openEditDrawer(character) {
   selectedCharacter.value = character
   editDrawerOpen.value = true
@@ -120,6 +122,8 @@ function viewCharacterDetails(character) {
 
 onMounted(async () => {
   loading.value = true
+  creatorId.value = useUserStore().authUser.id
+  console.log(creatorId.value)
   try {
     const { data, error } = await supabase
       .from('characters')

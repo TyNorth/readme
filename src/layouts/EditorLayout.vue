@@ -5,7 +5,7 @@
     :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-light text-black'"
   >
     <!-- Optional Header -->
-    <q-header v-if="false" class="bg-grey-10 text-white" elevated>
+    <q-header v-if="true" class="bg-grey-10 text-white">
       <q-toolbar>
         <q-btn flat dense round icon="sym_o_arrow_back" @click="goBack" />
         <q-toolbar-title> ✍️ Editor </q-toolbar-title>

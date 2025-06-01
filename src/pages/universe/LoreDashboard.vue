@@ -154,11 +154,13 @@
     <CreateLoreEntryDrawer
       v-model="createDrawerOpen"
       :universe-id="universeId"
+      :creator-id="creatorId"
       @created="handleLoreCreated"
     />
     <EditLoreEntryDrawer
       v-model="editDrawerOpen"
       :lore-entry-to-edit="selectedLoreEntry"
+      :creator-id="creatorId"
       @updated="handleLoreUpdated"
     />
   </q-page>
@@ -171,6 +173,7 @@ import { supabase } from '@/boot/supabase'
 import { Notify, Dialog, date } from 'quasar'
 import CreateLoreEntryDrawer from 'src/components/universe/dashboard/CreateLoreEntryDrawer.vue'
 import EditLoreEntryDrawer from 'src/components/universe/dashboard/EditLoreEntryDrawer.vue' // Ensure path is correct
+import { useUserStore } from 'src/stores/user-store'
 
 const route = useRoute()
 const router = useRouter()
@@ -182,6 +185,7 @@ const viewMode = ref('list') // Default view: 'list' or 'cards'
 
 const createDrawerOpen = ref(false)
 const editDrawerOpen = ref(false)
+const creatorId = ref(null)
 const selectedLoreEntry = ref(null)
 
 // Helper for icons based on lore type
@@ -221,6 +225,7 @@ function formatDate(timestamp) {
 
 async function fetchLoreEntries() {
   loading.value = true
+  creatorId.value = useUserStore().authUser.id
   try {
     const { data, error } = await supabase
       .from('lore_entries')

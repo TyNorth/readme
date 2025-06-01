@@ -97,32 +97,43 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  creatorId: {
+    type: String,
+    default: null,
+  },
 })
 const emit = defineEmits(['update:modelValue', 'created'])
 
 const defaultForm = () => ({
   title: '',
-  type: 'General', // Default type
+  type: 'general', // Default type
   summary: '',
   content: '',
   tags: [],
   universe_id: props.universeId,
+  creator_id: props.creatorId,
 })
 
 const form = ref(defaultForm())
 const loading = ref(false)
 
 const loreTypes = [
-  { label: 'General', value: 'General' },
-  { label: 'History', value: 'History' },
-  { label: 'Location', value: 'Location' },
-  { label: 'Character Arcana', value: 'Character Arcana' }, // For character-specific non-bio lore
-  { label: 'Item / Artifact', value: 'Item' },
-  { label: 'Event', value: 'Event' },
-  { label: 'Concept / System', value: 'Concept' }, // e.g., Magic System, Technology
-  { label: 'Organization / Faction', value: 'Organization' },
-  { label: 'Species / Race', value: 'Species' },
-  { label: 'Culture', value: 'Culture' },
+  // **** CHANGED: 'value' properties are now lowercase ****
+  { label: 'General', value: 'general' },
+  { label: 'History', value: 'history' },
+  { label: 'Location', value: 'location' },
+  { label: 'Character Arcana', value: 'character arcana' },
+  { label: 'Item / Artifact', value: 'item' }, // Corrected from 'Item / Artifact' if 'item' or 'artifact' is in DB
+  // Assuming 'artifact' from your DB DDL
+  { label: 'Event', value: 'event' },
+  { label: 'Concept / System', value: 'concept' },
+  { label: 'Organization / Faction', value: 'faction' }, // Assuming 'faction' from your DB DDL
+  { label: 'Species / Race', value: 'species' }, // Assuming 'creature' or 'species' in DB DDL, let's use 'creature' from DDL
+  { label: 'Creature', value: 'creature' }, // Added based on DDL
+  { label: 'Magic System', value: 'magic' }, // Added based on DDL
+  { label: 'Timeline', value: 'timeline' }, // Added based on DDL
+  { label: 'Language', value: 'language' }, // Added based on DDL
+  // { label: 'Culture', value: 'culture' }, // 'culture' is not in your DB check constraint
 ]
 
 watch(
@@ -131,6 +142,7 @@ watch(
     if (isOpen) {
       form.value = defaultForm() // Reset form when drawer opens
       form.value.universe_id = props.universeId // Ensure universe_id is set
+      form.value.creator_id = props.creatorId
     }
   },
 )
